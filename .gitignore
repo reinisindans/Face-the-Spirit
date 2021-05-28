@@ -1,2 +1,4 @@
 /Backend/venv/
 /Backend/.vscode/
+/Backend/.history/
+*.pyc
