@@ -8,14 +8,22 @@ class Game(models.Model):
     title= models.CharField(max_length=50)
     description= models.TextField(max_length=500)
     location= models.CharField(max_length=50)
+    def __str__(self):
+        return self.title
+
 class Question(models.Model):
     id_game= models.ForeignKey(Game, on_delete=models.CASCADE)
     text= models.TextField(max_length= 360)
     location= models.CharField(max_length=50)
+    def __str__(self):
+        return self.text
 class Answer(models.Model):
     id_question= models.ForeignKey(Question, on_delete=models.CASCADE)
     points= models.IntegerField()
     text= models.TextField(max_length=50)
+    def __str__(self):
+        return (str(self.id_question) + " : "+ str(self.text))
+
 class UserAnswer(models.Model):
     id_user= models.ForeignKey(User, on_delete=models.CASCADE)
     id_answer= models.ForeignKey(Answer, on_delete=models.CASCADE)
