@@ -7,11 +7,11 @@ from django.contrib.auth.models import User
 class Game(models.Model):
     title= models.CharField(max_length=50)
     description= models.TextField(max_length=500)
-    location= models.CharField(("0,0"), max_length=50)
+    location= models.CharField(max_length=50)
 class Question(models.Model):
     id_game= models.ForeignKey(Game, on_delete=models.CASCADE)
     text= models.TextField(max_length= 360)
-    location= models.CharField(("0,0"), max_length=50)
+    location= models.CharField(max_length=50)
 class Answer(models.Model):
     id_question= models.ForeignKey(Question, on_delete=models.CASCADE)
     points= models.IntegerField()
