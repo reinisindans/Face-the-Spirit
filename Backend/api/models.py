@@ -19,9 +19,13 @@ class Game(models.Model):
         # find all questions
         questions= Question.objects.filter(game=self)
         points=0
+        # calculate the maximum achievable point count
         for question in questions:
             answers= Answer.objects.filter(question=question)
-            points += max(
+            print("Trying to iterate", answers)
+            max_points = max([i.points for i in answers])
+            points += max_points
+        return points
 
     def __str__(self):
         return self.title

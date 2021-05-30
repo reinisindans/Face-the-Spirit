@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.authentication import TokenAuthentication
 
 from django.contrib.auth.models import User
 
@@ -16,6 +17,7 @@ class GameViewSet(viewsets.ReadOnlyModelViewSet):
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class= (QuestionSerializer)
+    authentication_classes = (TokenAuthentication, )
     
     #Adding a custom method to answer the question
     # telling what kind of a custom method this will be!
@@ -36,7 +38,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
                 response= {'message': "Answer not associated with this question!!"}
                 return Response(response, status= status.HTTP_409_CONFLICT) 
 
-            user= User.objects.get(id=1)
+            user= request.user
             print("user is: ", user)
 
             # Check if answer already present!
@@ -66,13 +68,16 @@ class AnswerViewSet(viewsets.ModelViewSet):
 class UserAnswerViewSet(viewsets.ModelViewSet):
     queryset = UserAnswer.objects.all()
     serializer_class= (UserAnswerSerializer) 
+    authentication_classes = (TokenAuthentication, )
 
     # telling what kind of a custom method this will be!
     @action(detail=False, methods=['GET'])
     def getOwnAnswers(self, request):
         # todo get all the answers that belong to this user!!
-        response= {'message': 'dummy message'}
-        return Response(response, sttatus = status.HTTP_200_OK)
+        user= request.user
+        print("user is: ", user)
+        response= {'message': ('Welcome, '+ user.username)}
+        return Response(response, status = status.HTTP_200_OK)
 
 class ResultsViewSet(viewsets.ModelViewSet):
     queryset = Results.objects.all()

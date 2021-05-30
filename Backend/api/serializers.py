@@ -4,7 +4,7 @@ from .models import Game, Question, Answer, UserAnswer, Results
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
         model= Game
-        fields= ("id", "title", "description", "location") 
+        fields= ("id", "title", "description", "location", "question_count", "max_points") 
 
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
