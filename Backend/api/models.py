@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 # Create your models here.
-
+# Models correspond to database tables and get translated internally to database
 
 class Game(models.Model):
     title= models.CharField(max_length=50)
@@ -57,5 +57,4 @@ class Results(models.Model):
     user= models.ForeignKey(User, on_delete=models.CASCADE)
     game= models.ForeignKey(Game, on_delete=models.CASCADE)
     points= models.IntegerField()
-    tries= models.IntegerField()
     date= models.DateTimeField(auto_now=True)

@@ -6,13 +6,26 @@ from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth.models import User
 
 from .models import Game, Question, Answer, UserAnswer, Results
-from .serializers import GameSerializer, QuestionSerializer, AnswerSerializer, UserAnswerSerializer, ResultsSerializer
+from .serializers import GameSerializer, QuestionSerializer, AnswerSerializer, UserAnswerSerializer, ResultsSerializer, UserSerializer
 
 # Create your views here.
+# Views are the 'interface' of the API with the ourside world. Methods/calls to API are defined here
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset= User.objects.all()
+    serializer_class= UserSerializer
+
 
 class GameViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Game.objects.all()
     serializer_class= (GameSerializer)
+    def update(self, request, *args, **kwargs): # overrides the default update function- user should not be able to update table
+        response= {'message': "You are not allowed to update the table"}
+        return Response(response, status= status.HTTP_401_UNAUTHORIZED) 
+    
+    def create(self, request, *args, **kwargs): # overrides the default create function- user should not be able to update table
+        response= {'message': "You are not allowed to create enties"}
+        return Response(response, status= status.HTTP_401_UNAUTHORIZED)  
 
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
@@ -37,10 +50,10 @@ class QuestionViewSet(viewsets.ModelViewSet):
                 print (answer.question.id != pk)
                 response= {'message': "Answer not associated with this question!!"}
                 return Response(response, status= status.HTTP_409_CONFLICT) 
-
+            # todo Check if user has logged in!!
             user= request.user
             print("user is: ", user)
-
+      
             # Check if answer already present!
             try:
                 userAnswer= UserAnswer.objects.get(user=user.id, question= question.id)
@@ -61,9 +74,26 @@ class QuestionViewSet(viewsets.ModelViewSet):
         else:
             response= {'message': "No answer provided!"} # this is the response object
             return Response(response, status= status.HTTP_204_NO_CONTENT) 
+
+# No POST methods except our custom method allowed! 
+    def update(self, request, *args, **kwargs): # overrides the default update function- user should not be able to update table
+        response= {'message': "You are not allowed to update the table"}
+        return Response(response, status= status.HTTP_401_UNAUTHORIZED) 
+    
+    def create(self, request, *args, **kwargs): # overrides the default create function- user should not be able to update table
+        response= {'message': "You are not allowed to create enties"}
+        return Response(response, status= status.HTTP_401_UNAUTHORIZED)     
+
 class AnswerViewSet(viewsets.ModelViewSet):
     queryset = Answer.objects.all()
-    serializer_class= (AnswerSerializer)    
+    serializer_class= (AnswerSerializer)
+    def update(self, request, *args, **kwargs): # overrides the default update function- user should not be able to update table
+        response= {'message': "You are not allowed to update the table"}
+        return Response(response, status= status.HTTP_401_UNAUTHORIZED) 
+    
+    def create(self, request, *args, **kwargs): # overrides the default create function- user should not be able to update table
+        response= {'message': "You are not allowed to create enties"}
+        return Response(response, status= status.HTTP_401_UNAUTHORIZED)      
 
 class UserAnswerViewSet(viewsets.ModelViewSet):
     queryset = UserAnswer.objects.all()
@@ -79,6 +109,13 @@ class UserAnswerViewSet(viewsets.ModelViewSet):
         response= {'message': ('Welcome, '+ user.username)}
         return Response(response, status = status.HTTP_200_OK)
 
+    def update(self, request, *args, **kwargs): # overrides the default update function- user should not be able to update table, it is being updated in Question Viewset
+        response= {'message': "You are not allowed to update the table"}
+        return Response(response, status= status.HTTP_401_UNAUTHORIZED) 
+    
+    def create(self, request, *args, **kwargs): # overrides the default create function- user should not be able to update table
+        response= {'message': "You are not allowed to create enties"}
+        return Response(response, status= status.HTTP_401_UNAUTHORIZED)  
 class ResultsViewSet(viewsets.ModelViewSet):
     queryset = Results.objects.all()
     serializer_class= ResultsSerializer
