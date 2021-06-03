@@ -3,6 +3,7 @@ import "./App.css";
 import { useState, useEffect } from "react";
 
 import Header from './components/header'
+import Map from './components/map'
 
 function App() {
   const [lat, setLat] = useState(null);
@@ -78,14 +79,11 @@ function App() {
     <div className="App">
       <Header handleGameChange= {handleGameChange} gameList={gameList} game={game}/>
       <div className="layout">
+      <Map/>
         <h2>Status: {status}</h2>
         <h2>Latitude: {lat}</h2>
         <h2>Longitude: {lng}</h2>
-        <div>
-            {gameList.map((game) => {
-            return <h2>{game.title}</h2>;
-          })}
-        </div>
+
       </div>
     </div>
   );

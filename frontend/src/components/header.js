@@ -14,7 +14,7 @@ const Header = (props) =>{
           onChange={props.handleGameChange}
         >
 
-        {props.gameList.map(game => (<MenuItem value={game.id}>{game.title}</MenuItem>))}
+        {props.gameList.map(game => (<MenuItem value={game.id} key={game.id}>{game.title}</MenuItem>))}
 
         </Select>
       </header>
