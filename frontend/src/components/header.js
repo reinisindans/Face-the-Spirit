@@ -2,6 +2,8 @@ import React from 'react'
 
 import { Select, InputLabel, MenuItem } from "@material-ui/core";
 
+import "../css/header.css"
+
 const Header = (props) =>{
     return (
         <header className="App-header">

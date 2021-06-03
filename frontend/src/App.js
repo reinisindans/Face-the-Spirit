@@ -1,15 +1,15 @@
 import "./css/App.css";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import Header from './components/header'
 import MainMap from './components/map'
 
 function App() {
 
-  const [coordinates, setCoordinates] = useState([56.955634, 24.116529])
+  const [coordinates, setCoordinates] = useState()
   const [status, setStatus] = useState(null);
-  const [game, setGame] = useState({id:1, location:[59.293, 23.746]});
+  const [game, setGame] = useState({ id: 1, location: [56.94199, 24.120308] });
   const [gameList, setGameList] = useState([{title:'testGame'}]);
   const [questions, setQuestions] = useState([]);
 
@@ -31,8 +31,6 @@ function App() {
     }
   }, []);
 
-
-
   useEffect(() => {  // getting the game list!
     fetch("http://127.0.0.1:8000/api/games/", {
       method: "GET",
@@ -48,7 +46,6 @@ function App() {
         for (var object in response){
           response[object].location = response[object].location.split(",")
         }
-        console.log("Setting game list: ", response)
         setGameList(response);
       })
       .catch((error) => console.log(error));
@@ -60,14 +57,15 @@ function App() {
       headers: { "Content-Type": "application/json" },
     })
       .then((response) => {
-        console.log(response)
+        console.log(response);
         return response.json();
         
       })
       .then((response) => {
         // pass the response objects to state
-        console.log(response);
-        response.location= response.location.split(",")
+        response.location = response.location.split(",")
+        console.log("setting the questions")
+        console.log(response)
         setQuestions(response);
       })
       .catch((error) => console.log(error));
@@ -77,22 +75,14 @@ function App() {
     setGame(gameList.filter((element) =>{
       return element.id === event.target.value
     })[0])
-    console.log("filter result: ", gameList.filter((element) =>{
-      return element.id === event.target.value
-    })[0])
     console.log("Changed game to : ", event.target.value)
-    console.log(game)
   };
 
   return (
     <div className="App">
       <Header handleGameChange= {handleGameChange} gameList={gameList} game={game}/>
       <div className="layout">
-      <MainMap game={game} coords={coordinates}/>
-        <h2>Status: {status}</h2>
-        <h2>Latitude: {coordinates[0]}</h2>
-        <h2>Longitude: {coordinates[1]}</h2>
-
+      <MainMap game={game} coords={game.location} questions={questions}/>
       </div>
     </div>
   );
