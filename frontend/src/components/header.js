@@ -10,7 +10,7 @@ const Header = (props) =>{
         <Select
           labelId="label"
           id="select"
-          defaultValue={props.game}
+          defaultValue={props.game.id}
           onChange={props.handleGameChange}
         >
 
