@@ -10,13 +10,15 @@ const Header = (props) =>{
         <Select
           labelId="label"
           id="select"
-          defaultValue={game}
+          defaultValue={props.game}
           onChange={props.handleGameChange}
         >
 
-        {gameList.map(game => (<MenuItem value={game.id}>{game.title}</MenuItem>))}
+        {props.gameList.map(game => (<MenuItem value={game.id}>{game.title}</MenuItem>))}
 
         </Select>
       </header>
     )
 }
+
+export default Header

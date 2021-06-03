@@ -2,7 +2,7 @@ import "./App.css";
 
 import { useState, useEffect } from "react";
 
-import { Select, InputLabel, MenuItem } from "@material-ui/core";
+import Header from './components/header'
 
 function App() {
   const [lat, setLat] = useState(null);
@@ -76,20 +76,7 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>Face the spirit App</h1>
-        <InputLabel id="label"></InputLabel>
-        <Select
-          labelId="label"
-          id="select"
-          defaultValue={game}
-          onChange={handleGameChange}
-        >
-
-        {gameList.map(game => (<MenuItem value={game.id}>{game.title}</MenuItem>))}
-
-        </Select>
-      </header>
+      <Header handleGameChange= {handleGameChange} gameList={gameList} game={game}/>
       <div className="layout">
         <h2>Status: {status}</h2>
         <h2>Latitude: {lat}</h2>
