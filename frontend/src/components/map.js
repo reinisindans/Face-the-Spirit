@@ -140,7 +140,7 @@ function toRadian(degree) {
         {props.questions.map((question) => {
           console.log("Mapping questions, ", question.text);
           return (
-            <Circle center={question.location} radius={question.radius}>
+            <Circle center={question.location} radius={question.radius} key={question.id}>
               <Popup>{question.text}</Popup>
             </Circle>
           );

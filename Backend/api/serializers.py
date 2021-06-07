@@ -10,7 +10,7 @@ from .models import Game, Question, Answer, UserAnswer, Results
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model= User
-        fields= ("id","username", "password")
+        fields= ("id",'username', "password")
         extra_kwargs = {'password': {'write_only': True, 'required': True}} #adding extra arguments to make password secure
         
     def create(self, validated_data): # create method override (could also be done in Views?)
