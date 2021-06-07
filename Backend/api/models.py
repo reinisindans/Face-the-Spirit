@@ -34,6 +34,7 @@ class Question(models.Model):
     game= models.ForeignKey(Game, on_delete=models.CASCADE)
     text= models.TextField(max_length= 360)
     location= models.CharField(max_length=50)
+    radius= models.IntegerField(default=20)
     def __str__(self):
         return self.text
 class Answer(models.Model):

@@ -30,8 +30,23 @@ class GameViewSet(viewsets.ReadOnlyModelViewSet):
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class= (QuestionSerializer)
-    authentication_classes = (TokenAuthentication, )
-    
+    #authentication_classes = (TokenAuthentication,)
+        
+    @action(detail=False, methods=['POST'])
+    def getGameQuestions(self, request, pk=None):
+        if ('game' in request.data):
+            print("Getting game questions: ",request.data['game'])
+            game = request.data['game']
+            try:
+                answer= Question.objects.filter(game=request.data['game'])
+                print("Getting the question for game ", request.data['game'])
+                serializer = QuestionSerializer(answer, many=True)
+                response = {'message': "Getting the corresponding questions", 'result': serializer.data}  # this is the response object
+                return Response(response, status= status.HTTP_202_ACCEPTED)
+            except:
+                response = {'message': "Error while fetching data. Are you sure the game ID exists?"}  # this is the response object
+                return Response(response, status= status.HTTP_204_NO_CONTENT)
+
     #Adding a custom method to answer the question
     # telling what kind of a custom method this will be!
     @action(detail=True, methods=['POST']) # detail= True means only one specific Answer must be provided

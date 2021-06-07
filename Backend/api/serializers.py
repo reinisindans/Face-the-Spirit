@@ -28,7 +28,7 @@ class GameSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model= Question
-        fields= ("id", "text", "location", "game")        
+        fields= ("id", "text", "location", "game", "radius")        
 
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
