@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 
+import {useCookies} from 'react-cookie'
+
 import "../css/question.css";
 
 const Question = (props) => {
-  const [answers, setAnswers] = useState([]);
+    const [answers, setAnswers] = useState([]);
+    const [token] = useCookies(['spirit-token']) // used to access the token!!! 
 
   useEffect(() => {
     // getting the answer list!
@@ -24,12 +27,15 @@ const Question = (props) => {
         .catch((error) => console.log(error));
     }
   }, [props.question]);
+    
+      const clickAnswerQuestion = () => {};
 
   console.log("Answer the question!!!", props.question);
   if (props.question !== undefined) {
     return (
       <div className="container">
         <div>{props.question.text}</div>
+        <button onClick={clickAnswerQuestion}>OK</button>
       </div>
     );
   } else {
