@@ -98,8 +98,8 @@ const locationCheck = (userLocation, questionList) => {
   const renderQuestion = () => {
     console.log("Location check!!!")
     if (questionIndex !== false && !props.answered.includes(questionIndex)) {
-      console.log("Answer the question!!!")
-      return <Question questionId={props.questions[questionIndex]} />;
+      
+      return <Question question={props.questions[questionIndex]} />;
     }
   };
 

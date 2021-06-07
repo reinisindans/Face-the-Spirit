@@ -108,7 +108,22 @@ class AnswerViewSet(viewsets.ModelViewSet):
     
     def create(self, request, *args, **kwargs): # overrides the default create function- user should not be able to update table
         response= {'message': "You are not allowed to create enties"}
-        return Response(response, status= status.HTTP_401_UNAUTHORIZED)      
+        return Response(response, status=status.HTTP_401_UNAUTHORIZED)
+            
+    @action(detail=False, methods=['POST'])
+    def getQuestionAnswers(self, request, pk=None):
+        if ('question' in request.data):
+            print("Getting game questions: ",request.data['question'])
+            question = request.data['question']
+            try:
+                answer= Answer.objects.filter(question=request.data['question'])
+                print("Getting the answers for question ", request.data['question'])
+                serializer = AnswerSerializer(answer, many=True)
+                response = {'message': "Getting the corresponding answers", 'result': serializer.data}  # this is the response object
+                return Response(response, status= status.HTTP_202_ACCEPTED)
+            except:
+                response = {'message': "Error while fetching data. Are you sure the game ID exists?"}  # this is the response object
+                return Response(response, status= status.HTTP_204_NO_CONTENT) 
 
 class UserAnswerViewSet(viewsets.ModelViewSet):
     queryset = UserAnswer.objects.all()
