@@ -8,10 +8,11 @@ const Auth = () => {
 
   useEffect(() => {
     console.log(token);
-      if (token["spirit-token"]) { // checking for cookie
-        console.log("redirecting")
-      window.location.href = "/map";
-    }
+      if (token["spirit-token"] && token["spirit-token"] !== undefined) {
+        // checking for cookie
+        console.log("redirecting");
+        window.location.href = "/map";
+      }
   }, [token]);
 
   const loginClicked = () => {

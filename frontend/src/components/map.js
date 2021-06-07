@@ -25,26 +25,45 @@ const MainMap = (props) => {
     html: iconMarkup,
   });
 
-  const getDistance = (location1, location2) => {
-    try {
-      let x = location1[0] - location2[0];
-      let y = location1[1] - location2[1];
-      return Math.sqrt(x ** 2 + y ** 2);
-    } catch {
-      console.log("Error calculating distance");
-      return 99999;
-    }
-  };
+  
+  function getDistance(origin, destination) {
+  if (origin && destination){
+    // return distance in meters
+    var lon1 = toRadian(origin[1]),
+      lat1 = toRadian(origin[0]),
+      lon2 = toRadian(destination[1]),
+      lat2 = toRadian(destination[0]);
+
+    var deltaLat = lat2 - lat1;
+    var deltaLon = lon2 - lon1;
+
+    var a =
+      Math.pow(Math.sin(deltaLat / 2), 2) +
+      Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon / 2), 2);
+    var c = 2 * Math.asin(Math.sqrt(a));
+    var EARTH_RADIUS = 6371;
+    console.log("Distance is: ", c * EARTH_RADIUS * 1000);
+    return (c * EARTH_RADIUS * 1000) / 2;
+  }
+    else return null
+}
+function toRadian(degree) {
+    return degree*Math.PI/180;
+};
 
   const locationCheck = (userLocation, questionList) => {
     for (let index in questionList) {
-      if (
+      console.log("Iterating questions: ", questionList)
+      if (questionList[index].location &&
         getDistance(userLocation, questionList[index].location) <
         questionList[index].radius
       ) {
-        return index;
-      } else {
-        return false;
+        console.log(
+          "Distance: ",
+          getDistance(userLocation, questionList[index].location)
+        );
+        console.log("Radius: ", questionList[index].radius);
+        return questionList[index].id;
       }
     }
   };
@@ -66,9 +85,9 @@ const MainMap = (props) => {
 
   useEffect(() => {
     console.log("Preparing to fly!");
-    console.log(game);
-    if (mapState) mapState.map.flyTo(game.location);
-  }, [game, mapState]);
+    console.log(props.game);
+    if (mapState) mapState.map.flyTo(props.game.location);
+  }, [mapState, props.game]);
 
   const renderUserLocation = () => {
     console.log("UserLocations: ", coordinates);
@@ -87,11 +106,20 @@ const MainMap = (props) => {
     }
   };
 
+  useEffect(() => {
+    
+  })
   let questionIndex = locationCheck(coordinates, props.questions);
+
   const renderQuestion = () => {
-    console.log("Location check!!!");
+    console.log(
+      "Location check!!!",
+      props.questions.filter((question) => {
+        return question.id == questionIndex;
+      })
+    );
     if (questionIndex !== false && !props.answered.includes(questionIndex)) {
-      return <Question question={props.questions[questionIndex]} />;
+      return <Question question={props.questions.filter(question => { return question.id == questionIndex })[0]} />;
     }
   };
 
@@ -109,7 +137,6 @@ const MainMap = (props) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {renderUserLocation(coordinates)}
-        {renderQuestion()}
         {props.questions.map((question) => {
           console.log("Mapping questions, ", question.text);
           return (
@@ -119,6 +146,7 @@ const MainMap = (props) => {
           );
         })}
       </MapContainer>
+      {renderQuestion()}
     </div>
   );
 };

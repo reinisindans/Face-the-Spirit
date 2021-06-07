@@ -1,7 +1,24 @@
-.container{
-    width: 70vh;
-    height:70vh;
-    position:absolute;
-    top:20%;
-    left:20%;
+.container {
+  position: absolute;
+  top: 30vh;
+  z-index: 650;
+  width: 400px;
+  margin-left: -200px;
+  left: 50%;
+  border: 3px solid green;
+  padding: 10px;
+  background-color: rgba(161, 226, 205, 0.322);
+}
+
+.header{
+    background-color:rgba(0, 100, 0, 0.664);
+    font-size: larger;
+    font-weight: bold;
+    width: 100%;
+}
+
+.answerContainer{
+    display: flex;
+    flex-direction: row;
+align-items: center;
 }
