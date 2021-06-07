@@ -1,0 +1,18 @@
+.mapdiv {
+  height: 80vh;
+  width: 100%;
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+#userLocation{
+  color:maroon
+}
+
+.leaflet-div-icon {
+    background: transparent;
+    border: none;
+}  
