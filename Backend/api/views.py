@@ -107,7 +107,8 @@ class UserAnswerViewSet(viewsets.ModelViewSet):
         if ('answer' in request.data) :
             #get the Answer object based on 
             answer= Answer.objects.get(id=request.data['answer'])
-            user= request.user
+            user = request.user
+            print("Answer in request")
   
             # Check if the answer corresponds to question! Parsing to int, otherwise not comparable
             if int(answer.question.id) != int(pk):

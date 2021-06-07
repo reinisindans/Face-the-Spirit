@@ -15,7 +15,9 @@ const rigaLocation = [56.951475, 24.113143];
 const MainMap = (props) => {
   const [mapState, setMapState] = useState();
   const [coordinates, setCoordinates] = useState();
-  const [game, setGame] = useState(props.game);
+  const [gamePoints, setGamePoints] = useState(0);
+  const [questions, setQuestions] = useState([]);
+  const [answered, setAnswered] = useState([]);
 
   // define the userLocation Icon from FontAwesome
   const iconMarkup = renderToStaticMarkup(
@@ -25,38 +27,37 @@ const MainMap = (props) => {
     html: iconMarkup,
   });
 
-  
   function getDistance(origin, destination) {
-  if (origin && destination){
-    // return distance in meters
-    var lon1 = toRadian(origin[1]),
-      lat1 = toRadian(origin[0]),
-      lon2 = toRadian(destination[1]),
-      lat2 = toRadian(destination[0]);
+    if (origin && destination) {
+      // return distance in meters
+      var lon1 = toRadian(origin[1]),
+        lat1 = toRadian(origin[0]),
+        lon2 = toRadian(destination[1]),
+        lat2 = toRadian(destination[0]);
 
-    var deltaLat = lat2 - lat1;
-    var deltaLon = lon2 - lon1;
+      var deltaLat = lat2 - lat1;
+      var deltaLon = lon2 - lon1;
 
-    var a =
-      Math.pow(Math.sin(deltaLat / 2), 2) +
-      Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon / 2), 2);
-    var c = 2 * Math.asin(Math.sqrt(a));
-    var EARTH_RADIUS = 6371;
-    console.log("Distance is: ", c * EARTH_RADIUS * 1000);
-    return (c * EARTH_RADIUS * 1000) / 2;
+      var a =
+        Math.pow(Math.sin(deltaLat / 2), 2) +
+        Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon / 2), 2);
+      var c = 2 * Math.asin(Math.sqrt(a));
+      var EARTH_RADIUS = 6371;
+      console.log("Distance is: ", c * EARTH_RADIUS * 1000);
+      return (c * EARTH_RADIUS * 1000) / 2;
+    } else return null;
   }
-    else return null
-}
-function toRadian(degree) {
-    return degree*Math.PI/180;
-};
+  function toRadian(degree) {
+    return (degree * Math.PI) / 180;
+  }
 
   const locationCheck = (userLocation, questionList) => {
     for (let index in questionList) {
-      console.log("Iterating questions: ", questionList)
-      if (questionList[index].location &&
+      console.log("Iterating questions: ", questionList);
+      if (
+        questionList[index].location &&
         getDistance(userLocation, questionList[index].location) <
-        questionList[index].radius
+          questionList[index].radius
       ) {
         console.log(
           "Distance: ",
@@ -67,6 +68,35 @@ function toRadian(degree) {
       }
     }
   };
+
+  // TODO calculate points after answered changes
+
+  // TODO change/ trigger answered after question has been answered in question.js
+
+  useEffect(() => {
+    // getting the questions of current game! Only after game change/setting
+    fetch("http://127.0.0.1:8000/api/questions/getGameQuestions/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ game: props.game.id }),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((response) => {
+        // pass the response objects to state
+        //console.log(response);
+        for (let object in response.result) {
+          console.log("Lookking ar question: ", response.result);
+          response.result[object].location =
+            response.result[object].location.split(",");
+        }
+        //console.log("setting the questions");
+        //console.log(response.result);
+        setQuestions(response.result);
+      })
+      .catch((error) => console.log(error));
+  }, [props.game]);
 
   useEffect(() => {
     // getting the user location listener!!!!!
@@ -106,20 +136,35 @@ function toRadian(degree) {
     }
   };
 
-  useEffect(() => {
-    
-  })
-  let questionIndex = locationCheck(coordinates, props.questions);
+  const updateAnswered = (answer) => {
+    console.log("This is answer to everything!", answer)
+    let newAnswered = answered
+    newAnswered.push(answer);
+    console.log("This is the new Answered question!", newAnswered)
+      setAnswered(newAnswered)
+    };
+
+  let questionIndex = locationCheck(coordinates, questions);
 
   const renderQuestion = () => {
     console.log(
       "Location check!!!",
-      props.questions.filter((question) => {
-        return question.id == questionIndex;
+      questions.filter((question) => {
+        return question.id === parseInt(questionIndex);
       })
     );
-    if (questionIndex !== false && !props.answered.includes(questionIndex)) {
-      return <Question question={props.questions.filter(question => { return question.id == questionIndex })[0]} />;
+    if (questionIndex !== false && !answered.includes(questionIndex)) {
+      console.log("Question index is: ", questionIndex)
+      return (
+        <Question
+          question={
+            questions.filter((question) => {
+              return question.id == questionIndex;
+            })[0]
+          }
+          updateAnswered={updateAnswered}
+        />
+      );
     }
   };
 
@@ -137,10 +182,14 @@ function toRadian(degree) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {renderUserLocation(coordinates)}
-        {props.questions.map((question) => {
+        {questions.map((question) => {
           console.log("Mapping questions, ", question.text);
           return (
-            <Circle center={question.location} radius={question.radius} key={question.id}>
+            <Circle
+              center={question.location}
+              radius={question.radius}
+              key={question.id}
+            >
               <Popup>{question.text}</Popup>
             </Circle>
           );
