@@ -19,6 +19,7 @@ atrodoties projekta bāzes mapē, terminālī ievadīt:
 ### Palaist react serveri  
 atrodoties projekta bāzes mapē, terminālī ievadīt:
 1. cd frontend
+2. npm install
 2. npm start
 
  
