@@ -15,7 +15,7 @@ const rigaLocation = [56.951475, 24.113143];
 const MainMap = (props) => {
   const [mapState, setMapState] = useState();
   const [coordinates, setCoordinates] = useState();
-  const [gamePoints, setGamePoints] = useState(0);
+
   const [questions, setQuestions] = useState([]);
   const [answered, setAnswered] = useState([]);
 
@@ -43,7 +43,6 @@ const MainMap = (props) => {
         Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon / 2), 2);
       var c = 2 * Math.asin(Math.sqrt(a));
       var EARTH_RADIUS = 6371;
-      console.log("Distance is: ", c * EARTH_RADIUS * 1000);
       return (c * EARTH_RADIUS * 1000) / 2;
     } else return null;
   }
@@ -53,17 +52,11 @@ const MainMap = (props) => {
 
   const locationCheck = (userLocation, questionList) => {
     for (let index in questionList) {
-      console.log("Iterating questions: ", questionList);
       if (
         questionList[index].location &&
         getDistance(userLocation, questionList[index].location) <
           questionList[index].radius
       ) {
-        console.log(
-          "Distance: ",
-          getDistance(userLocation, questionList[index].location)
-        );
-        console.log("Radius: ", questionList[index].radius);
         return questionList[index].id;
       }
     }
@@ -87,7 +80,6 @@ const MainMap = (props) => {
         // pass the response objects to state
         //console.log(response);
         for (let object in response.result) {
-          console.log("Lookking ar question: ", response.result);
           response.result[object].location =
             response.result[object].location.split(",");
         }
@@ -114,13 +106,11 @@ const MainMap = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log("Preparing to fly!");
-    console.log(props.game);
+    // TODO fix this to make it work!!
     if (mapState) mapState.map.flyTo(props.game.location);
   }, [mapState, props.game]);
 
   const renderUserLocation = () => {
-    console.log("UserLocations: ", coordinates);
     if (coordinates) {
       return (
         <Marker
@@ -137,12 +127,11 @@ const MainMap = (props) => {
   };
 
   const updateAnswered = (answer) => {
-    console.log("This is answer to everything!", answer)
-    let newAnswered = answered
+    let newAnswered = answered;
     newAnswered.push(answer);
-    console.log("This is the new Answered question!", newAnswered)
-      setAnswered(newAnswered)
-    };
+    console.log("This is the new Answered question!", newAnswered);
+    setAnswered(newAnswered);
+  };
 
   let questionIndex = locationCheck(coordinates, questions);
 
@@ -150,16 +139,21 @@ const MainMap = (props) => {
     console.log(
       "Location check!!!",
       questions.filter((question) => {
-        return question.id === parseInt(questionIndex);
+        return parseInt(question.id) === parseInt(questionIndex);
       })
     );
-    if (questionIndex !== false && !answered.includes(questionIndex)) {
-      console.log("Question index is: ", questionIndex)
+    console.log("Question index is: ", questionIndex);
+    if (
+      questionIndex !== false &&
+      !answered.includes(parseInt(questionIndex))
+    ) {
+      console.log("Question index is: ", questionIndex);
       return (
         <Question
+          key={answered}
           question={
             questions.filter((question) => {
-              return question.id == questionIndex;
+              return parseInt(question.id) === parseInt(questionIndex);
             })[0]
           }
           updateAnswered={updateAnswered}
@@ -184,15 +178,17 @@ const MainMap = (props) => {
         {renderUserLocation(coordinates)}
         {questions.map((question) => {
           console.log("Mapping questions, ", question.text);
-          return (
-            <Circle
-              center={question.location}
-              radius={question.radius}
-              key={question.id}
-            >
-              <Popup>{question.text}</Popup>
-            </Circle>
-          );
+          if (!answered.includes(parseInt(question.id))) {
+            return (
+              <Circle
+                center={question.location}
+                radius={question.radius}
+                key={question.id}
+              >
+                <Popup>{question.text}</Popup>
+              </Circle>
+            );
+          }
         })}
       </MapContainer>
       {renderQuestion()}

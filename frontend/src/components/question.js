@@ -8,7 +8,7 @@ const Question = (props) => {
   const [answers, setAnswers] = useState([]);
   const [token] = useCookies(["spirit-token"]); // used to access the token!!!
   const [selectedAnswer, setSelectedAnswer] = useState();
-  const [user] = useState();
+  
 
   useEffect(() => {
     // getting the answer list!
@@ -26,7 +26,6 @@ const Question = (props) => {
         })
         .then((response) => {
           // pass the response objects to state
-          console.log("Answers: ", response.result);
           setAnswers(response.result);
         })
         .catch((error) => console.log(error));
@@ -34,7 +33,6 @@ const Question = (props) => {
   }, [props.question, token]);
 
   const clickAnswerQuestion = () => {
-    console.log("Selected answer is: ", selectedAnswer);
     fetch(
       `http://127.0.0.1:8000/api/userAnswers/${props.question.id}/answerQuestion/`,
       {
@@ -50,16 +48,14 @@ const Question = (props) => {
         return response.json();
       })
       .then((response) => {
-        console.log("THis is our question id: ", props.question.id);
+        
         const questionId = props.question.id;
         props.updateAnswered(questionId);
-        console.log("Answers: ", response.message);
       })
       .catch((error) => console.log(error));
   };
 
   const selectAnswer = (event) => {
-    console.log(event.target.value);
     setSelectedAnswer(event.target.value);
   };
 

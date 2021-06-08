@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from "react";
 
-const gamePoints = (props) => {
-    return (
-        <div id="container">
-            
-        </div>
-    )
-}
+const GamePoints = (props) => {
+
+  const [gamePoints, setGamePoints] = useState(0);
+
+  return <div id="container"></div>;
+};
+
+
+export default gamePoints
