@@ -1,0 +1,19 @@
+#pointsContainer{
+    position: absolute;
+    top: 20vh;
+    left: 90vh;
+    display: flex;
+    z-index: 650;
+    flex-direction: row;
+    align-items:center;
+    justify-content: center;
+}
+
+.star{
+    width: 40px;
+    height: 40px;
+}
+
+.points{
+ font-size:xx-large
+}

@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
+
+import "../css/points.css";
 
 const GamePoints = (props) => {
 
-  const [gamePoints, setGamePoints] = useState(0);
-
-  return <div id="container"></div>;
+    return (
+      <div id="pointsContainer">
+        <img classname="star" src={'staricon.png'} alt="points" />
+        <div className="points">   {props.points}</div>
+      </div>
+    );
 };
 
 
