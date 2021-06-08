@@ -15,7 +15,6 @@ const rigaLocation = [56.951475, 24.113143];
 const MainMap = (props) => {
   const [mapState, setMapState] = useState();
   const [coordinates, setCoordinates] = useState();
-
   const [questions, setQuestions] = useState([]);
   const [answered, setAnswered] = useState([]);
 
@@ -150,7 +149,6 @@ const MainMap = (props) => {
       console.log("Question index is: ", questionIndex);
       return (
         <Question
-          key={answered}
           question={
             questions.filter((question) => {
               return parseInt(question.id) === parseInt(questionIndex);
@@ -159,6 +157,9 @@ const MainMap = (props) => {
           updateAnswered={updateAnswered}
         />
       );
+    }
+    else {
+      return null
     }
   };
 

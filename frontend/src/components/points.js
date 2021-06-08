@@ -8,4 +8,4 @@ const GamePoints = (props) => {
 };
 
 
-export default gamePoints
+export default GamePoints

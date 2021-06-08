@@ -8,6 +8,7 @@ const Question = (props) => {
   const [answers, setAnswers] = useState([]);
   const [token] = useCookies(["spirit-token"]); // used to access the token!!!
   const [selectedAnswer, setSelectedAnswer] = useState();
+  const [visibility, setVisibility] = useState(true)
   
 
   useEffect(() => {
@@ -48,9 +49,10 @@ const Question = (props) => {
         return response.json();
       })
       .then((response) => {
-        
         const questionId = props.question.id;
         props.updateAnswered(questionId);
+        setVisibility(false);
+        
       })
       .catch((error) => console.log(error));
   };
@@ -60,9 +62,9 @@ const Question = (props) => {
   };
 
   console.log("Answer the question!!!", props.question);
-  if (props.question !== undefined && answers !== []) {
+  if (props.question !== undefined && answers !== [] && visibility) {
     return (
-      <div className="container">
+      <div className="container" >
         <div className="header">{props.question.text}</div>
         {answers.map((answer) => {
           console.log("Mapping questions, ", answer.text);
