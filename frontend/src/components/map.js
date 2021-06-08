@@ -9,6 +9,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { divIcon } from "leaflet";
 
 import Question from "../components/question";
+import GamePoints from "../components/points"
 
 const rigaLocation = [56.951475, 24.113143];
 
@@ -17,6 +18,7 @@ const MainMap = (props) => {
   const [coordinates, setCoordinates] = useState();
   const [questions, setQuestions] = useState([]);
   const [answered, setAnswered] = useState([]);
+  const [points, setPoints] = useState(0)
 
   // define the userLocation Icon from FontAwesome
   const iconMarkup = renderToStaticMarkup(
@@ -193,6 +195,7 @@ const MainMap = (props) => {
         })}
       </MapContainer>
       {renderQuestion()}
+      <GamePoints points={points} />
     </div>
   );
 };

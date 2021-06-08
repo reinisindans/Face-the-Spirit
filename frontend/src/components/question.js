@@ -51,7 +51,7 @@ const Question = (props) => {
       .then((response) => {
         const questionId = props.question.id;
         props.updateAnswered(questionId);
-        setVisibility(false);
+        setVisibility(false)
         
       })
       .catch((error) => console.log(error));
