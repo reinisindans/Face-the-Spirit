@@ -91,12 +91,40 @@ class UserAnswerViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['GET'])
     def getOwnAnswers(self, request):
         # todo get all the answers that belong to this user!!
-        user= request.user
+        user = request.user
+        queryset = UserAnswer.objects.all()
+        ownAnswers = queryset.filter(user=user.id)
+        serializer = UserAnswerSerializer(ownAnswers, many=True)
         print("user is: ", user)
-        response = {'message': ('Welcome, ' + user.username)}
-        queryset.objects.filter(user=user.id)
+        response = {'message': ('Your answers were:'), 'result': serializer.data}
         return Response(response, status=status.HTTP_200_OK)
-        
+
+    @action(detail=False, methods=['POST'])
+    def getOwnPoints(self, request, pk=None):
+        # todo sum all the points that belong to this user
+        if ('game' in request.data):
+            user = request.user
+            game = request.data['game']
+            questions = Question.objects.all()
+            gameQuestions = questions.filter(game=game)
+            gameQuestionIds = list(gameQuestions.values_list('id', flat=True))
+            answers = UserAnswer.objects.all()
+            ownAnswers = answers.filter(user=user.id)
+            sum = 0
+            if (ownAnswers):
+                for answer in ownAnswers:
+                    if (answer.question.id in gameQuestionIds):
+                        sum +=answer.points
+                        print(sum)
+            
+            response = {'message': ('Your points in this game'), 'result': sum}
+            
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            response= {'message': "No game provided!"} # this is the response object
+            return Response(response, status= status.HTTP_204_NO_CONTENT) 
+
+
     #Adding a custom method to answer the question
     # telling what kind of a custom method this will be!
     @action(detail=True, methods=['POST']) # detail= True means only one specific Answer must be provided

@@ -1,11 +1,11 @@
 #pointsContainer{
     position: absolute;
     top: 20vh;
-    left: 90vh;
+    right: 10vh;
     display: flex;
     z-index: 650;
     flex-direction: row;
-    align-items:center;
+    align-items: center;
     justify-content: center;
 }
 
