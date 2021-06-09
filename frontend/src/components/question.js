@@ -8,7 +8,8 @@ const Question = (props) => {
   const [answers, setAnswers] = useState([]);
   const [token] = useCookies(["spirit-token"]); // used to access the token!!!
   const [selectedAnswer, setSelectedAnswer] = useState();
-  const [user] = useState();
+  const [visibility, setVisibility] = useState(true)
+  
 
   useEffect(() => {
     // getting the answer list!
@@ -17,7 +18,7 @@ const Question = (props) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Token ${token}`,
+          Authorization: `Token ${token['spirit-token']}`,
         },
         body: JSON.stringify({ question: props.question.id }),
       })
@@ -26,29 +27,53 @@ const Question = (props) => {
         })
         .then((response) => {
           // pass the response objects to state
-          console.log("Answers: ", response.result);
           setAnswers(response.result);
         })
         .catch((error) => console.log(error));
     }
   }, [props.question, token]);
 
-  const clickAnswerQuestion = () => {};
+  const clickAnswerQuestion = () => {
+    fetch(
+      `http://127.0.0.1:8000/api/userAnswers/${props.question.id}/answerQuestion/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token["spirit-token"]}`,
+        },
+        body: JSON.stringify({ answer: selectedAnswer }),
+      }
+    )
+      .then((response) => {
+        return response.json();
+      })
+      .then((response) => {
+        const questionId = props.question.id;
+        props.updateAnswered(questionId,response.result.points);
+        setVisibility(false)
+        
+      })
+      .catch((error) => console.log(error));
+  };
 
   const selectAnswer = (event) => {
-    console.log(event.target.value);
     setSelectedAnswer(event.target.value);
   };
 
   console.log("Answer the question!!!", props.question);
-  if (props.question !== undefined && answers !== []) {
+  if (props.question !== undefined && answers !== [] && visibility) {
     return (
-      <div className="container">
+      <div className="container" >
         <div className="header">{props.question.text}</div>
         {answers.map((answer) => {
           console.log("Mapping questions, ", answer.text);
           return (
-            <div className="answerContainer" onChange={selectAnswer}>
+            <div
+              className="answerContainer"
+              onChange={selectAnswer}
+              key={answer.id}
+            >
               <input type="radio" name="choiceButton" value={answer.id}></input>
               <div className="answer">{answer.text}</div>
             </div>
