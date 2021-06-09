@@ -1,13 +1,28 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 
 import { Select, InputLabel, MenuItem } from "@material-ui/core";
+import { useCookies } from "react-cookie";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 
 import "../css/header.css"
 
-const Header = (props) =>{
+const Header = (props) => {
+
+  const [token, setToken, removeToken] = useCookies(['spirit-token'])
+  
+
+  useEffect(() => {
+    if (!token['spirit-token']) {
+      window.location.href='/'
+    }
+  },[token])
+
+  const logoutUser = () => {
+    removeToken(['spirit-token'])
+  }
+
     return (
       <header className="App-header">
         <h1>Face the spirit App</h1>
@@ -24,7 +39,7 @@ const Header = (props) =>{
             </MenuItem>
           ))}
         </Select>
-        <FontAwesomeIcon icon={faSignOutAlt} size="lg"/>
+        <FontAwesomeIcon icon={faSignOutAlt} size="lg" onClick={ logoutUser}/>
       </header>
     );
 }

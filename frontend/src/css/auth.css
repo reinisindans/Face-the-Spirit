@@ -1,0 +1,46 @@
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  background-color: #8a93a7;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.body {
+  background-color: #8a93a7;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.text{
+    
+    margin: 8px,0;
+    color: white;
+    font-weight: bold;
+}
+
+.userInput{
+    padding: 10px;
+    margin: 8px 0;
+}
+
+button{
+    color:darkgrey;
+    background-color: #f3f3f3;
+    padding:5px 10px;
+    border-radius: 2px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    
+}
