@@ -39,7 +39,7 @@ const Header = (props) => {
             </MenuItem>
           ))}
         </Select>
-        <FontAwesomeIcon icon={faSignOutAlt} size="lg" onClick={ logoutUser}/>
+        <FontAwesomeIcon className='logoutIcon' icon={faSignOutAlt} size="2x" onClick={ logoutUser} cursor='hand'/>
       </header>
     );
 }
