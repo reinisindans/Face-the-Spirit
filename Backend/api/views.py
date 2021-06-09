@@ -99,6 +99,19 @@ class UserAnswerViewSet(viewsets.ModelViewSet):
         response = {'message': ('Your answers were:'), 'result': serializer.data}
         return Response(response, status=status.HTTP_200_OK)
 
+    # telling what kind of a custom method this will be!
+    @action(detail=False, methods=['GET'])
+    def getOwnAnsweredQuestions(self, request):
+        # todo get all the answers that belong to this user!!
+        user = request.user
+        queryset = UserAnswer.objects.all()
+        ownAnswers = queryset.filter(user=user.id)
+        answeredQuestions = ownAnswers.values_list('question', flat=True).distinct()
+        serializer = UserAnswerSerializer(ownAnswers, many=True)
+        print("user is: ", user)
+        response = {'message': ('Your answers were:'), 'result': answeredQuestions}
+        return Response(response, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['POST'])
     def getOwnPoints(self, request, pk=None):
         # todo sum all the points that belong to this user

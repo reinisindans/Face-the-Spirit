@@ -18,7 +18,7 @@ const Question = (props) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
+          Authorization: `Token ${token['spirit-token']}`,
         },
         body: JSON.stringify({ question: props.question.id }),
       })
@@ -50,7 +50,7 @@ const Question = (props) => {
       })
       .then((response) => {
         const questionId = props.question.id;
-        props.updateAnswered(questionId);
+        props.updateAnswered(questionId,response.result.points);
         setVisibility(false)
         
       })

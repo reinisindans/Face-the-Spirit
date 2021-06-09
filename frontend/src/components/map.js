@@ -1,34 +1,34 @@
 import React, { useState, useEffect } from "react";
+import { useCookies } from "react-cookie";
+import { MapContainer, TileLayer, Circle, Marker, Popup } from "react-leaflet";
+
 
 import "../css/map.css";
-
-import { MapContainer, TileLayer, Circle, Marker, Popup } from "react-leaflet";
 
 // needed for userIcon
 import { renderToStaticMarkup } from "react-dom/server";
 import { divIcon } from "leaflet";
 
 import Question from "../components/question";
-import GamePoints from "../components/points"
+import GamePoints from "../components/points";
 
 const rigaLocation = [56.951475, 24.113143];
 
-const MainMap = (props) => {
-  const [mapState, setMapState] = useState();
-  const [coordinates, setCoordinates] = useState();
-  const [questions, setQuestions] = useState([]);
-  const [answered, setAnswered] = useState([]);
-  const [points, setPoints] = useState(0)
 
-  // define the userLocation Icon from FontAwesome
-  const iconMarkup = renderToStaticMarkup(
-    <i className=" fa fa-walking fa-3x" />
-  );
-  const customMarkerIcon = divIcon({
-    html: iconMarkup,
-  });
+const locationCheck = (userLocation, questionList) => {
+  for (let index in questionList) {
+    if (
+      questionList[index].location &&
+      getDistance(userLocation, questionList[index].location) <
+        questionList[index].radius
+    ) {
+      return questionList[index].id;
+    }
+  }
+};
 
-  function getDistance(origin, destination) {
+
+  const getDistance = (origin, destination) => {
     if (origin && destination) {
       // return distance in meters
       var lon1 = toRadian(origin[1]),
@@ -46,26 +46,75 @@ const MainMap = (props) => {
       var EARTH_RADIUS = 6371;
       return (c * EARTH_RADIUS * 1000) / 2;
     } else return null;
-  }
-  function toRadian(degree) {
-    return (degree * Math.PI) / 180;
-  }
-
-  const locationCheck = (userLocation, questionList) => {
-    for (let index in questionList) {
-      if (
-        questionList[index].location &&
-        getDistance(userLocation, questionList[index].location) <
-          questionList[index].radius
-      ) {
-        return questionList[index].id;
-      }
-    }
   };
+  const toRadian = (degree) => {
+    return (degree * Math.PI) / 180;
+  };
+
+const MainMap = (props) => {
+  const [token] = useCookies(["spirit-token"]); // used to access the token!!!
+  const [mapState, setMapState] = useState();
+  const [coordinates, setCoordinates] = useState();
+  const [questions, setQuestions] = useState([]);
+  const [selectedQuestion, setSelectedQuestion] = useState(-1);
+  const [answered, setAnswered] = useState([]);
+  const [points, setPoints] = useState(0);
+
+
+  // define the userLocation Icon from FontAwesome
+  const iconMarkup = renderToStaticMarkup(
+    <i className=" fa fa-walking fa-3x" />
+  );
+  const customMarkerIcon = divIcon({
+    html: iconMarkup,
+  });
+
 
   // TODO calculate points after answered changes
 
   // TODO change/ trigger answered after question has been answered in question.js
+
+  // Get the answered questions on session start
+  useEffect(() => {
+    
+    fetch("http://127.0.0.1:8000/api/userAnswers/getOwnAnsweredQuestions/", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${token["spirit-token"]}`,
+      },
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((response) => {
+        // pass the response objects to state
+        console.log("Already answered questions: ", response.result);
+        setAnswered(response.result);
+      })
+      .catch((error) => console.log(error));
+  }, [token]);
+
+  // getting the points for the current game!!!
+    useEffect(() => {
+      fetch("http://127.0.0.1:8000/api/userAnswers/getOwnPoints/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token["spirit-token"]}`,
+        },
+        body: JSON.stringify({ game: props.game.id }),
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((response) => {
+          // pass the response objects to state
+          console.log("Got this many points:", response.result);
+          setPoints(response.result);
+        })
+        .catch((error) => console.log(error));
+    }, [token, props.game, answered]);
 
   useEffect(() => {
     // getting the questions of current game! Only after game change/setting
@@ -107,6 +156,10 @@ const MainMap = (props) => {
   }, []);
 
   useEffect(() => {
+    setSelectedQuestion(locationCheck(coordinates, questions));
+  }, [coordinates, questions]);
+
+  useEffect(() => {
     // TODO fix this to make it work!!
     if (mapState) mapState.map.flyTo(props.game.location);
   }, [mapState, props.game]);
@@ -127,42 +180,63 @@ const MainMap = (props) => {
     }
   };
 
-  const updateAnswered = (answer) => {
+  const updateAnswered = (answer, gotPoints) => {
     let newAnswered = answered;
     newAnswered.push(answer);
+    const newPoints= points+gotPoints
+    setPoints(newPoints);
     console.log("This is the new Answered question!", newAnswered);
     setAnswered(newAnswered);
   };
 
-  let questionIndex = locationCheck(coordinates, questions);
-
   const renderQuestion = () => {
-    console.log(
-      "Location check!!!",
-      questions.filter((question) => {
-        return parseInt(question.id) === parseInt(questionIndex);
-      })
-    );
-    console.log("Question index is: ", questionIndex);
-    if (
-      questionIndex !== false &&
-      !answered.includes(parseInt(questionIndex))
-    ) {
-      console.log("Question index is: ", questionIndex);
-      return (
-        <Question
-          question={
-            questions.filter((question) => {
-              return parseInt(question.id) === parseInt(questionIndex);
-            })[0]
-          }
-          updateAnswered={updateAnswered}
-        />
+    if (answered !== undefined && selectedQuestion!== undefined && coordinates) {
+      console.log(
+        questions.filter((question) => {
+          return parseInt(question.id) === parseInt(selectedQuestion);
+        })
+      );
+      if (
+        selectedQuestion !== false &&
+        !answered.includes(parseInt(selectedQuestion))
+      ) {
+        return (
+          <Question
+            question={
+              questions.filter((question) => {
+                return parseInt(question.id) === parseInt(selectedQuestion);
+              })[0]
+            }
+            updateAnswered={updateAnswered}
+          />
+        );
+      } else {
+        return null;
+      }
+    } else return null;
+  };
+
+  const renderCircles = () => {
+    if (answered !== undefined) {
+      return questions.map((question) => {
+        console.log("Mapping questions, ", question.text, question.id);
+        if (!answered.includes(parseInt(question.id))) {
+          console.log("drawing circles", question.location);
+          return (
+            <Circle
+              className="questionCircle"
+              center={question.location}
+              radius={question.radius}
+              key={question.id}
+            >
+              <Popup>{question.text}</Popup>
+            </Circle>
+          );
+        } else return null;
+      }
       );
     }
-    else {
-      return null
-    }
+    else return null
   };
 
   console.log("parsing map");
@@ -179,20 +253,7 @@ const MainMap = (props) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {renderUserLocation(coordinates)}
-        {questions.map((question) => {
-          console.log("Mapping questions, ", question.text);
-          if (!answered.includes(parseInt(question.id))) {
-            return (
-              <Circle
-                center={question.location}
-                radius={question.radius}
-                key={question.id}
-              >
-                <Popup>{question.text}</Popup>
-              </Circle>
-            );
-          }
-        })}
+        {renderCircles()}
       </MapContainer>
       {renderQuestion()}
       <GamePoints points={points} />
